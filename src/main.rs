@@ -1,6 +1,6 @@
 use atuin_server_sqlite_unofficial::Sqlite;
+use tokio::net::lookup_host;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
-use std::net::SocketAddr;
 
 #[tokio::main]
 async fn main() {
@@ -17,13 +17,11 @@ async fn main() {
         .init();
 
     let settings = atuin_server::Settings::new().unwrap();
-    let host = settings.host.clone(); // Host is a String
-    let port = settings.port; // Port is a u16
-
-    // Combine host and port into a SocketAddr
-    let addr: SocketAddr = format!("{host}:{port}")
-        .parse()
-        .expect("Invalid host or port");
+    let addr = lookup_host((&*settings.host, settings.port))
+        .await
+        .expect("listen addr should be valid")
+        .next()
+        .expect("listen addr should be valid");
 
     atuin_server::launch::<Sqlite>(settings, addr)
         .await
