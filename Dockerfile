@@ -14,11 +14,12 @@ RUN cargo build --release --bin atuin-server-sqlite-unofficial
 
 FROM docker.io/library/alpine:3.21
 ENV RUST_LOG=atuin::api=info \
+    TZ=Etc/UTC \
     ATUIN_HOST=0.0.0.0 \
     ATUIN_PORT=8888 \
     ATUIN_CONFIG_DIR=/config \
     ATUIN_DB_URI=sqlite:///config/atuin.db
-RUN apk add --no-cache ca-certificates catatonit sqlite-libs
+RUN apk add --no-cache ca-certificates catatonit sqlite-libs tzdata
 USER nobody:nogroup
 WORKDIR /config
 VOLUME ["/config"]
