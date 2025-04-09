@@ -25,9 +25,13 @@ WORKDIR /app
 
 USER atuin
 
-ENV TZ=Etc/UTC
-ENV RUST_LOG=atuin::api=info
-ENV ATUIN_CONFIG_DIR=/config
+ENV \
+    ATUIN_CONFIG_DIR=/config \
+    ATUIN_DB_URI=sqlite:///config/atuin.db \
+    ATUIN_HOST=0.0.0.0 \
+    RUST_LOG=atuin::api=info \
+    TZ=Etc/UTC
 
 COPY --from=builder /app/target/release/atuin-server-sqlite-unofficial /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/atuin-server-sqlite-unofficial"]
+CMD ["server", "start"]
