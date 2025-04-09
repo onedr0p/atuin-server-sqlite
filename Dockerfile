@@ -21,9 +21,6 @@ FROM debian:bookworm-20250113-slim AS runtime
 RUN useradd -c 'atuin user' atuin && mkdir /config && chown atuin:atuin /config
 # Install ca-certificates for webhooks to work
 RUN apt update && apt install ca-certificates sqlite3 -y && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
-
-USER atuin
 
 ENV \
     ATUIN_CONFIG_DIR=/config \
@@ -31,6 +28,10 @@ ENV \
     ATUIN_HOST=0.0.0.0 \
     RUST_LOG=atuin::api=info \
     TZ=Etc/UTC
+
+USER atuin
+WORKDIR /config
+VOLUME ["/config"]
 
 COPY --from=builder /app/target/release/atuin-server-sqlite-unofficial /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/atuin-server-sqlite-unofficial"]
